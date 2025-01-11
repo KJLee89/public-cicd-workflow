@@ -1,0 +1,95 @@
+---
+name: Public CICD workflow for Python code
+
+on:
+  workflow_call:
+    inputs:
+      linter:
+        description: Linter
+        required: true
+        type: boolean
+      platform:
+        description: Docker Buildx platform
+        required: false
+        type: string
+        default: "linux/arm64"
+    secrets:
+      CROSS_REPO_TOKEN:
+        required: true
+
+jobs:
+  linter:
+    name: Code Linter
+    runs-on: ubuntu-latest
+    if: ${{ inputs.linter }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Py Linter
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: main
+          VALIDATE_ALL_CODEBASE: true
+          GITHUB_TOKEN: <GITHUB_TOKEN>
+
+  build-container:
+    name: Build and Test Container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout CICD Repo
+        uses: actions/checkout@v3
+        with:
+          repository: path/to/repo/
+          ref: main
+          path: path/to/repo/
+          token: <CROSS_REPO_TOKEN>
+
+      - name: Checkout Python Repo
+        uses: actions/checkout@v3
+        with:
+          repository: path/to/repo/
+          ref: main
+          path: path/to/repo/
+          token: <CROSS_REPO_TOKEN>
+
+      - name: Copy all Py Repo files
+        run: cp -r <path/to/python/repo/> .
+
+      - name: Debug list files
+        run: |
+          pwd
+          ls -la
+
+      - name: Setup QEMU for Docker
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: |
+          docker buildx build \
+            --platform ${{ inputs.platform }} \
+            -t python-project-image:latest \
+            --file ./path/to/Dockerfile \
+            --tag local-test-image:latest \
+            --progress=plain \
+            --load .
+
+      - name: Run Docker Container
+        run: |
+          docker run -d --name python-test-container python-project-image tail -f /dev/null
+          sleep 5
+          docker container ps
+
+      - name: Execute Tests Inside Container
+        run: |
+          docker exec -w /app python-test-container python repo/url/to/py/script/<py_script>.py
+
+      - name: Stop and Remove Container
+        run: |
+          docker stop python-test-container
+          docker rm python-test-container

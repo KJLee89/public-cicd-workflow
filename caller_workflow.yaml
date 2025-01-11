@@ -1,0 +1,21 @@
+# This workflow should be in the caller repo (private)
+---
+name: Python Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-cicd-repo:
+    uses: repo/url/to/workflow.yaml@branch
+    permissions:
+      actions: read
+      contents: read
+      statuses: write
+    with:
+      run_tests: false
+      # platform: linux/amd64
+    secrets:
+      CROSS_REPO_TOKEN: <CROSS_REPO_TOKEN>
