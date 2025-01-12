@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: "linux/arm64"
+      py_script:
+        description: Py script name to deploy
+        required: true
+        type: string
     secrets:
       CROSS_REPO_TOKEN:
         required: true
@@ -87,7 +91,7 @@ jobs:
 
       - name: Execute Tests Inside Container
         run: |
-          docker exec -w /app python-test-container python repo/url/to/py/script/<py_script>.py
+          docker exec -w /app python-test-container python repo/url/to/py/script/${{ inputs.py_script }}.py
 
       - name: Stop and Remove Container
         run: |

@@ -21,6 +21,7 @@ Reusable workflow to call from your Python code repo to do the following
 - CROSS_REPO_TOKEN (Required): Required to use GitHub Actions Plugins
     - Token is only required in the repository that is calling the repo with the reusable workflow
     - Token should have `contents:read` permission enabled
+- py_script_name: Name of python script without extension to deploy
 
 
 # Dependencies/Utilities

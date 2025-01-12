@@ -17,5 +17,6 @@ jobs:
     with:
       run_tests: false
       # platform: linux/amd64
+      py_script: <py_script_name>
     secrets:
       CROSS_REPO_TOKEN: <CROSS_REPO_TOKEN>
