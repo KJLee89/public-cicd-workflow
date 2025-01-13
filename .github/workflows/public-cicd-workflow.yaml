@@ -79,6 +79,7 @@ jobs:
             --platform ${{ inputs.platform }} \
             -t python-project-image:latest \
             --file ./path/to/Dockerfile \
+            --build-arg PY_SCRIPT_FILE=${{ inputs.py_script }} \
             --tag local-test-image:latest \
             --progress=plain \
             --load .
